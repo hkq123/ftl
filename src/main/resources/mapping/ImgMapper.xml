@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hkq.dao.ImgMapper" >
+  <resultMap id="BaseResultMap" type="com.hkq.entity.Img" >
+    <id column="IID" property="iid" jdbcType="DECIMAL" />
+    <result column="INAME" property="iname" jdbcType="VARCHAR" />
+    <result column="IUUIDNAME" property="iuuidname" jdbcType="VARCHAR" />
+    <result column="ID" property="id" jdbcType="DECIMAL" />
+  </resultMap>
+
+  <!-- 批量添加粽子相册-->
+  <insert id="insertBatchZzImage" parameterType="java.util.ArrayList">
+    INSERT  INTO  z_img  ( <include refid="Base_Column_List"/>)
+    SELECT  Z_IMG_SEQUEN.nextval,t1.*
+    FROM (
+    <foreach collection="list" item="u" index="i" separator="union all">
+      select
+      #{u.iname,jdbcType=VARCHAR}, #{u.iuuidname,jdbcType=VARCHAR},#{u.id,jdbcType=DECIMAL}
+      from dual
+    </foreach>
+    )t1
+
+  </insert>
+
+
+  <sql id="Base_Column_List" >
+    IID, INAME, IUUIDNAME, ID
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Short" >
+    select 
+    <include refid="Base_Column_List" />
+    from Z_IMG
+    where IID = #{iid,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Short" >
+    delete from Z_IMG
+    where IID = #{iid,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.hkq.entity.Img" >
+    insert into Z_IMG (IID, INAME, IUUIDNAME, 
+      ID)
+    values (#{iid,jdbcType=DECIMAL}, #{iname,jdbcType=VARCHAR}, #{iuuidname,jdbcType=VARCHAR}, 
+      #{id,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.hkq.entity.Img" >
+    insert into Z_IMG
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="iid != null" >
+        IID,
+      </if>
+      <if test="iname != null" >
+        INAME,
+      </if>
+      <if test="iuuidname != null" >
+        IUUIDNAME,
+      </if>
+      <if test="id != null" >
+        ID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="iid != null" >
+        #{iid,jdbcType=DECIMAL},
+      </if>
+      <if test="iname != null" >
+        #{iname,jdbcType=VARCHAR},
+      </if>
+      <if test="iuuidname != null" >
+        #{iuuidname,jdbcType=VARCHAR},
+      </if>
+      <if test="id != null" >
+        #{id,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.hkq.entity.Img" >
+    update Z_IMG
+    <set >
+      <if test="iname != null" >
+        INAME = #{iname,jdbcType=VARCHAR},
+      </if>
+      <if test="iuuidname != null" >
+        IUUIDNAME = #{iuuidname,jdbcType=VARCHAR},
+      </if>
+      <if test="id != null" >
+        ID = #{id,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where IID = #{iid,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.hkq.entity.Img" >
+    update Z_IMG
+    set INAME = #{iname,jdbcType=VARCHAR},
+      IUUIDNAME = #{iuuidname,jdbcType=VARCHAR},
+      ID = #{id,jdbcType=DECIMAL}
+    where IID = #{iid,jdbcType=DECIMAL}
+  </update>
+</mapper>

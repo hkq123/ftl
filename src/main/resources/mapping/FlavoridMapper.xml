@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hkq.dao.FlavoridMapper" >
+  <resultMap id="BaseResultMap" type="com.hkq.entity.Flavorid" >
+    <id column="FLAVORID" property="flavorid" jdbcType="DECIMAL" />
+    <result column="FNAME" property="fname" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    FLAVORID, FNAME
+  </sql>
+
+  <select id="selectZzFlavorList" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from Z_FLAVORID
+  </select>
+
+
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Short" >
+    delete from Z_FLAVORID
+    where FLAVORID = #{flavorid,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.hkq.entity.Flavorid" >
+    insert into Z_FLAVORID (FLAVORID, FNAME)
+    values (#{flavorid,jdbcType=DECIMAL}, #{fname,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.hkq.entity.Flavorid" >
+    insert into Z_FLAVORID
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="flavorid != null" >
+        FLAVORID,
+      </if>
+      <if test="fname != null" >
+        FNAME,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="flavorid != null" >
+        #{flavorid,jdbcType=DECIMAL},
+      </if>
+      <if test="fname != null" >
+        #{fname,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.hkq.entity.Flavorid" >
+    update Z_FLAVORID
+    <set >
+      <if test="fname != null" >
+        FNAME = #{fname,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where FLAVORID = #{flavorid,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.hkq.entity.Flavorid" >
+    update Z_FLAVORID
+    set FNAME = #{fname,jdbcType=VARCHAR}
+    where FLAVORID = #{flavorid,jdbcType=DECIMAL}
+  </update>
+</mapper>

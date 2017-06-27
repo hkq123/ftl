@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hkq.dao.ZzMapper" >
+  <resultMap id="BaseResultMap" type="com.hkq.entity.Zz" >
+    <id column="ID" property="id" jdbcType="DECIMAL" />
+    <result column="ZBRAND" property="zbrand" jdbcType="VARCHAR" />
+    <result column="ZORIGIN" property="zorigin" jdbcType="VARCHAR" />
+    <result column="ZPRICE" property="zprice" jdbcType="VARCHAR" />
+    <result column="ZDATEINPRODUCED" property="zdateinproduced" jdbcType="TIMESTAMP" />
+    <result column="ZSALESDATE" property="zsalesdate" jdbcType="TIMESTAMP" />
+    <result column="ZEXPIRATIONDATE" property="zexpirationdate" jdbcType="TIMESTAMP" />
+    <result column="FLAVORID" property="flavorid" jdbcType="DECIMAL" />
+  </resultMap>
+
+
+
+  
+  <insert id="insertZzForm" parameterType="com.hkq.entity.Zz" useGeneratedKeys="true" keyColumn="id">
+    <selectKey  keyColumn="id" keyProperty="id" resultType="java.math.BigDecimal" order="BEFORE">
+      select Z_ZZ_SEQUEN.nextval as id from dual
+    </selectKey>
+    insert into z_zz
+    VALUES (#{id,jdbcType=DECIMAL}, #{zbrand,jdbcType=VARCHAR}, #{zorigin,jdbcType=VARCHAR},
+    #{zprice,jdbcType=VARCHAR}, #{zdateinproduced,jdbcType=TIMESTAMP}, #{zsalesdate,jdbcType=TIMESTAMP},
+    #{zexpirationdate,jdbcType=TIMESTAMP}, #{flavorid,jdbcType=DECIMAL})
+  </insert>
+
+<!-- 条件下载excel-->
+  <select id="selectWhereZz" resultMap="BaseResultMapList">
+    select <include refid="Many_Column_List"></include>
+    from z_zz t1 LEFT JOIN Z_FLAVORID t2
+    ON t1.flavorid  = t2.flavorid
+    <trim prefix="where" prefixOverrides="and" >
+      <if test="zbrand != null and zbrand != ''">
+        and t1.zbrand like '%${zbrand}%'
+      </if>
+    </trim>
+  </select>
+  <!-- 下载excel-->
+  <select id="selectZz" resultMap="BaseResultMapList">
+    select <include refid="Many_Column_List"></include>
+    from z_zz t1 LEFT JOIN Z_FLAVORID t2
+    ON t1.flavorid  = t2.flavorid
+  </select>
+
+
+  <resultMap id="BaseResultMapList" type="com.hkq.entity.Zz" >
+    <id column="z_id" property="id" jdbcType="DECIMAL" />
+    <result column="z_zbrand" property="zbrand" jdbcType="VARCHAR" />
+    <result column="z_zorigin" property="zorigin" jdbcType="VARCHAR" />
+    <result column="z_zprice" property="zprice" jdbcType="VARCHAR" />
+    <result column="z_zdateinproduced" property="zdateinproduced" jdbcType="TIMESTAMP" />
+
+    <association property="flavor" javaType="com.hkq.entity.Flavorid">
+      <id column="f_flavorid" property="flavorid" jdbcType="DECIMAL" />
+      <result column="f_fname" property="fname" jdbcType="VARCHAR" />
+    </association>
+  </resultMap>
+
+<sql id="Many_Column_List">
+    t1.id as z_id, t1.zbrand as z_zbrand, t1.zorigin as z_zorigin, t1.zprice as z_zprice, t1.zdateinproduced as z_zdateinproduced,
+    t2.flavorid as f_flavorid,t2.fname as f_fname
+</sql>
+
+  <sql id="where_sql">
+    <trim prefix="where" prefixOverrides="and">
+      <if test="whereMap != null &amp;&amp; whereMap.zbrand != null and whereMap.zbrand != ''">
+        AND t1.zbrand LIKE '%${whereMap.zbrand}%'
+      </if>
+    </trim>
+  </sql>
+
+
+  <!--分页+条件 查询userList-->
+  <select id="selectZzList" resultMap="BaseResultMapList" parameterType="com.hkq.util.PageUtil">
+    select tt.* from (
+    select t.*,rownum rn from
+    (
+    SELECT <include refid="Many_Column_List"></include>
+    FROM z_zz t1 LEFT JOIN Z_FLAVORID t2
+    ON t1.flavorid = t2.flavorid
+    <include refid="where_sql"></include>
+    ) t
+    where rownum &lt;= #{end}
+    ) tt where rn &gt; #{start}
+  </select>
+
+  <!--查询总条数-->
+  <select id="selectZzListCount" resultType="Integer" parameterType="com.hkq.util.PageUtil">
+    SELECT COUNT (t1.id)
+    FROM z_zz t1 LEFT JOIN Z_FLAVORID t2
+    ON t1.flavorid  = t2.flavorid
+
+  </select>
+
+
+
+
+  <sql id="Base_Column_List" >
+    ID, ZBRAND, ZORIGIN, ZPRICE, ZDATEINPRODUCED, ZSALESDATE, ZEXPIRATIONDATE, FLAVORID
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Short" >
+    select 
+    <include refid="Base_Column_List" />
+    from Z_ZZ
+    where ID = #{id,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Short" >
+    delete from Z_ZZ
+    where ID = #{id,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.hkq.entity.Zz" >
+    insert into Z_ZZ (ID, ZBRAND, ZORIGIN, 
+      ZPRICE, ZDATEINPRODUCED, ZSALESDATE, 
+      ZEXPIRATIONDATE, FLAVORID)
+    values (#{id,jdbcType=DECIMAL}, #{zbrand,jdbcType=VARCHAR}, #{zorigin,jdbcType=VARCHAR}, 
+      #{zprice,jdbcType=VARCHAR}, #{zdateinproduced,jdbcType=TIMESTAMP}, #{zsalesdate,jdbcType=TIMESTAMP}, 
+      #{zexpirationdate,jdbcType=TIMESTAMP}, #{flavorid,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.hkq.entity.Zz" >
+    insert into Z_ZZ
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        ID,
+      </if>
+      <if test="zbrand != null" >
+        ZBRAND,
+      </if>
+      <if test="zorigin != null" >
+        ZORIGIN,
+      </if>
+      <if test="zprice != null" >
+        ZPRICE,
+      </if>
+      <if test="zdateinproduced != null" >
+        ZDATEINPRODUCED,
+      </if>
+      <if test="zsalesdate != null" >
+        ZSALESDATE,
+      </if>
+      <if test="zexpirationdate != null" >
+        ZEXPIRATIONDATE,
+      </if>
+      <if test="flavorid != null" >
+        FLAVORID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=DECIMAL},
+      </if>
+      <if test="zbrand != null" >
+        #{zbrand,jdbcType=VARCHAR},
+      </if>
+      <if test="zorigin != null" >
+        #{zorigin,jdbcType=VARCHAR},
+      </if>
+      <if test="zprice != null" >
+        #{zprice,jdbcType=VARCHAR},
+      </if>
+      <if test="zdateinproduced != null" >
+        #{zdateinproduced,jdbcType=TIMESTAMP},
+      </if>
+      <if test="zsalesdate != null" >
+        #{zsalesdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="zexpirationdate != null" >
+        #{zexpirationdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="flavorid != null" >
+        #{flavorid,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <!--修改 -->
+  <update id="updateZz" parameterType="com.hkq.entity.Zz" >
+    update Z_ZZ set
+      <if test="zbrand != null" >
+        ZBRAND = #{zbrand,jdbcType=VARCHAR},
+      </if>
+      <if test="zorigin != null" >
+        ZORIGIN = #{zorigin,jdbcType=VARCHAR},
+      </if>
+      <if test="zprice != null" >
+        ZPRICE = #{zprice,jdbcType=VARCHAR},
+      </if>
+      <if test="zdateinproduced != null" >
+        ZDATEINPRODUCED = #{zdateinproduced,jdbcType=TIMESTAMP},
+      </if>
+      <if test="zsalesdate != null" >
+        ZSALESDATE = #{zsalesdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="zexpirationdate != null" >
+        ZEXPIRATIONDATE = #{zexpirationdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="flavorid != null" >
+        FLAVORID = #{flavorid,jdbcType=DECIMAL},
+      </if>
+    where ID = #{id,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.hkq.entity.Zz" >
+    update Z_ZZ
+    set ZBRAND = #{zbrand,jdbcType=VARCHAR},
+      ZORIGIN = #{zorigin,jdbcType=VARCHAR},
+      ZPRICE = #{zprice,jdbcType=VARCHAR},
+      ZDATEINPRODUCED = #{zdateinproduced,jdbcType=TIMESTAMP},
+      ZSALESDATE = #{zsalesdate,jdbcType=TIMESTAMP},
+      ZEXPIRATIONDATE = #{zexpirationdate,jdbcType=TIMESTAMP},
+      FLAVORID = #{flavorid,jdbcType=DECIMAL}
+    where ID = #{id,jdbcType=DECIMAL}
+  </update>
+</mapper>
